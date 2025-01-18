@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -8,6 +9,7 @@ import 'screens/disaster_list_screen.dart';
 import 'services/earthquake_alert_service.dart';
 import 'widgets/earthquake_alert_overlay.dart';
 import 'services/earthquake_service.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,21 +47,55 @@ class _MainNavigationState extends State<MainNavigation> {
   bool _showAlert = false;
   Map<String, dynamic>? _latestEarthquake;
   final EarthquakeService _earthquakeService = EarthquakeService();
+  StreamSubscription? _alertSubscription;
   
   @override
   void initState() {
     super.initState();
     _selectedIndex = 0; // Ensure initial index is valid
     _checkForNearbyEarthquakes();
+    _subscribeToAlertStatus();
+  }
+
+  void _subscribeToAlertStatus() {
+    debugPrint('Initializing Alert status subscription');
+    _alertSubscription = EarthquakeAlertService.getAlertStatus().listen(
+      (showAlert) {
+        debugPrint('Received alert status from Firebase: $showAlert');
+        if (showAlert) {
+          _checkForNearbyEarthquakes();
+        } else {
+          setState(() {
+            _showAlert = false;
+          });
+        }
+      },
+      onError: (error) {
+        debugPrint('Error in alert subscription: $error');
+      }
+    );
+  }
+
+  @override
+  void dispose() {
+    _alertSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkForNearbyEarthquakes() async {
+    debugPrint('Checking for nearby earthquakes...');
     final position = await EarthquakeAlertService.getCurrentLocation();
-    if (position == null) return;
+    if (position == null) {
+      debugPrint('Failed to get current location');
+      return;
+    }
 
     try {
       final earthquakes = await _earthquakeService.getRecentEarthquakes();
-      if (earthquakes.isEmpty) return;
+      if (earthquakes.isEmpty) {
+        debugPrint('No earthquakes data available');
+        return;
+      }
 
       final latestEarthquake = earthquakes.first;
       
@@ -88,6 +124,7 @@ class _MainNavigationState extends State<MainNavigation> {
             'wilayah': latestEarthquake.wilayah,
           };
         });
+        debugPrint('Alert overlay activated with earthquake data');
       }
     } catch (e) {
       debugPrint('Error checking nearby earthquakes: $e');

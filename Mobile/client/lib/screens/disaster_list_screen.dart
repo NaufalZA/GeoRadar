@@ -33,22 +33,38 @@ class _DisasterListScreenState extends State<DisasterListScreen> {
           DateTime dateB = DateFormat('dd-MM-yyyy').parse(dateStrB);
           return dateB.compareTo(dateA);
         } catch (e) {
-          // If parsing fails, handle text descriptions
-          if (dateStrA.contains('tahun lalu') && dateStrB.contains('tahun lalu')) {
-            // Extract numbers from strings like "35 juta tahun lalu"
-            int yearsA = int.tryParse(dateStrA.split(' ')[0]) ?? 0;
-            int yearsB = int.tryParse(dateStrB.split(' ')[0]) ?? 0;
-            return yearsB.compareTo(yearsA);
+          // If parsing fails, handle historic dates
+          bool isYearsAgoA = dateStrA.contains('tahun lalu');
+          bool isYearsAgoB = dateStrB.contains('tahun lalu');
+          
+          // If both are historic dates
+          if (isYearsAgoA && isYearsAgoB) {
+            // Extract numbers and convert to comparable values
+            int yearsA = extractYears(dateStrA);
+            int yearsB = extractYears(dateStrB);
+            return yearsA.compareTo(yearsB); // Smaller numbers (more recent) come first
           }
-          // Put numeric dates before text descriptions
-          if (dateStrA.contains('tahun lalu')) return 1;
-          if (dateStrB.contains('tahun lalu')) return -1;
+          
+          // Put regular dates before historic dates
+          if (isYearsAgoA) return 1;
+          if (isYearsAgoB) return -1;
           return 0;
         }
       });
       setState(() {
         disasters = data;
       });
+    }
+  }
+
+  int extractYears(String dateStr) {
+    final numbers = dateStr.replaceAll(RegExp(r'[^0-9]'), '');
+    final value = int.tryParse(numbers) ?? 0;
+    
+    if (dateStr.contains('juta')) {
+      return value * 1000000;
+    } else {
+      return value;
     }
   }
 
