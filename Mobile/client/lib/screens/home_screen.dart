@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/earthquake.dart';
 import '../services/earthquake_service.dart';
 import '../widgets/earthquake_map.dart';
@@ -13,11 +14,113 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final EarthquakeService _service = EarthquakeService();
   late Future<List<Earthquake>> _earthquakes;
+  bool _isLocationPermissionGranted = false;
+  Position? _userLocation;
 
   @override
   void initState() {
     super.initState();
     _earthquakes = _service.getRecentEarthquakes();
+    _initializeLocation();
+  }
+
+  Future<void> _initializeLocation() async {
+    try {
+      await _checkLocationPermission();
+      if (_isLocationPermissionGranted) {
+        await _getCurrentLocation();
+      }
+    } catch (e) {
+      debugPrint('Location initialization error: $e');
+    }
+  }
+
+  Future<void> _checkLocationPermission() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location services are disabled.')),
+          );
+        }
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Location permissions are denied.')),
+            );
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permissions are permanently denied.'),
+            ),
+          );
+        }
+        return;
+      }
+
+      setState(() {
+        _isLocationPermissionGranted = true;
+      });
+    } catch (e) {
+      debugPrint('Permission check error: $e');
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 5),
+      ).then((Position position) {
+        setState(() {
+          _userLocation = position;
+        });
+      }).catchError((e) {
+        debugPrint('Position error: $e');
+      });
+    } catch (e) {
+      debugPrint('Error getting location: $e');
+    }
+  }
+
+  String _getDistanceText(Earthquake earthquake) {
+    if (_userLocation == null) return '';
+    
+    // Parse latitude
+    String lat = earthquake.lintang.replaceAll('°', '').trim();
+    double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
+    if (lat.contains('LS')) latitude *= -1; // Convert South latitude to negative
+
+    // Parse longitude
+    String lon = earthquake.bujur.replaceAll('°', '').trim();
+    double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
+    // BT (East) is positive by default, no need to modify
+
+    double distanceInMeters = Geolocator.distanceBetween(
+      _userLocation!.latitude,
+      _userLocation!.longitude,
+      latitude,
+      longitude,
+    );
+    
+    if (distanceInMeters >= 1000) {
+      return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari lokasi Anda';
+    } else {
+      return '${distanceInMeters.toStringAsFixed(0)} m dari lokasi Anda';
+    }
   }
 
   @override
@@ -26,6 +129,18 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('GeoRadar'),
         actions: [
+          if (!_isLocationPermissionGranted)
+            IconButton(
+              icon: const Icon(Icons.location_disabled),
+              onPressed: () {
+                _checkLocationPermission().then((_) {
+                  if (_isLocationPermissionGranted) {
+                    _getCurrentLocation();
+                  }
+                });
+              },
+              tooltip: 'Enable Location',
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -91,6 +206,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               Text(latestQuake.dirasakan),
+                            ],
+                            if (_userLocation != null) ...[
+                              const SizedBox(height: 8),
+                              Text(_getDistanceText(latestQuake)),
                             ],
                           ],
                         ),
