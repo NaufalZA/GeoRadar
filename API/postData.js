@@ -2,256 +2,319 @@ const axios = require("axios");
 
 const disasters = [
   {
-    kategori: "Earthquake",
-    nama: "Magnitude 1.0 Earthquake",
-    lokasi: "58 km W of Anchor Point, Alaska",
-    tanggal: "16 Januari 2025",
+    kategori: "Gempa Bumi",
+    nama: "Gempa bumi 1.5 Magnitudo",
+    lokasi: "Idyllwild, California",
+    tanggal: "17-01-2025",
   },
+  
   {
-    kategori: "Earthquake",
-    nama: "Magnitude 6.8 Earthquake",
-    lokasi: "18 km SE of Miyazaki, Japan",
-    tanggal: "13 Januari 2025",
+    kategori: "Gempa Bumi 6.0",
+    nama: "Gempa bumi 6.8 Magnitudo",
+    lokasi: "18 km SE of Miyazaki, Jepang",
+    tanggal: "13-01-2025",
   },
+  
+  {
+    kategori: "Gempa Bumi 7.0",
+    nama: "Gempa bumi 7.1 Magnitudo",
+    lokasi: "Southern Tibetan Plateau",
+    tanggal: "07-01-2025",
+  },
+  
+  {
+    kategori: "Gempa Bumi 8.0",
+    nama: "Gempa bumi 8.1 Magnitudo",
+    lokasi: " Kepulauan Sandwich Selatan",
+    tanggal: "13-08-2021",
+  },
+  
+  {
+    kategori: "Gempa Bumi 9.0",
+    nama: "Gempa bumi 9.1 Magnitudo",
+    Lokasi: "Jepang",
+    tanggal: "11-03-2011",
+  },
+  
+  {
+    kategori: "Gempa Bumi 9.5",
+    nama: "Gempa bumi Estimated 9.5 magnitudo",
+    Lokasi: "Lumaco, Chile",
+    tanggal: "23-05-1960",
+  },
+  
+  
+  
   {
     kategori: "Tsunami",
-    nama: "0.2m High Tsunami",
-    lokasi: "Hyuganada Sea",
-    tanggal: "13 Januari 2025",
+    nama: "Tsunami setinggi 0.2m",
+    lokasi: "Laut Hyuganada",
+    tanggal: "13-01-2025",
   },
+  
+  {
+    kategori: "10m High Tsunami",
+    nama: "Tsunami setinggi 17m",
+    lokasi: "Pedersen Lagoon, Alaska",
+    tanggal: "07-08-2024",
+  },
+  
+  {
+    kategori: "50m High Tsunami",
+    nama: "Tsunami setinggi 200m",
+    lokasi: "Dickson Fjord, Greenland",
+    tanggal: "16-09-2023",
+  },
+  
+  {
+    kategori: "100m High Megatsunami",
+    nama: "Tsunami setinggi 200m",
+    lokasi: "Dickson Fjord, Greenland",
+    tanggal: "16-09-2023",
+  },
+  
+  {
+    kategori: "250m High Megatsunami",
+    nama: "Tsunami setinggi 250m",
+    lokasi: "Washington",
+    tanggal: "18-05-1980",
+  },
+  
+  {
+    kategori: "500m High Megatsunami",
+    nama: "Tsunami setinggi 524.6m",
+    lokasi: "Lituya Bay, Alaska",
+    tanggal: "10-07-1958",
+  },
+  
+  
+  
+  {
+    kategori: "Solar Flare",
+    nama: "Class M1.5 solar flare",
+    tanggal: "17-01-2025",
+  },
+  
+  {
+    kategori: "Class X1 Solar Flare",
+    nama: "Class X1.8 solar flare",
+    tanggal: "04-01-2025",
+  },
+  
+  {
+    kategori: "Class X5 Solar Flare",
+    nama: "Class X5.8 solar flare",
+    tanggal: "11-05-2024",
+  },
+  
   {
     kategori: "Interplanetary Shock",
-    nama: "Interplanetary Shock",
-    tanggal: "13 Januari 2025",
+    nama: "Interplanetary Shock terdeteksi",
+    tanggal: "13-01-2025",
   },
-  {
-    kategori: "Solar Flare",
-    nama: "Class C2.8 Solar Flare",
-    tanggal: "11 Januari 2025",
-  },
-  {
-    kategori: "Earthquake",
-    nama: "Magnitude 7.1 Earthquake (Southern Tibetan Plateau)",
-    tanggal: "7 Januari 2025",
-  },
-  {
-    kategori: "Solar Flare",
-    nama: "Class X1.8 Solar Flare",
-    tanggal: "4 Januari 2025",
-  },
+  
   {
     kategori: "Geomagnetic Storm",
-    nama: "Geomagnetic Storm",
-    tanggal: "1 Januari 2025",
+    nama: "Geomagnetic storm terdeteksi",
+    tanggal: "01-01-2025",
   },
+  
   {
     kategori: "Strong Geomagnetic Storm",
-    nama: "Strong Geomagnetic Storm",
-    tanggal: "1 Januari 2025",
+    nama: "Strong geomagnetic storm terdeteksi",
+    tanggal: "01-01-2025",
   },
+  
   {
     kategori: "Severe Geomagnetic Storm",
-    nama: "Severe Geomagnetic Storm",
-    tanggal: "1 Januari 2025",
+    nama: "Severe geomagnetic storm terdeteksi",
+    tanggal: "01-01-2025",
   },
+  
   {
-    kategori: "Volcanic Eruption",
-    nama: "Kilauea Eruption",
-    lokasi: "United States",
-    tanggal: "23 Desember 2024",
+    kategori: "Extreme Geomagnetic Storm",
+    nama: "Extreme geomagnetic storm",
+    tanggal: "28-10-2003",
   },
+  
   {
-    kategori: "Kiloton Asteroid Impact",
-    nama: "3.4kt Asteroid Impact",
-    lokasi: "Pacific Ocean",
-    tanggal: "21 Desember 2024",
+    kategori: "Gravitational Wave",
+    nama: "Gravitational wave terdeteksi",
+    tanggal: "30-05-2023",
   },
+  
+  
+  
+  {
+    kategori: "Letusan Vulkanik",
+    nama: "Kilauea eruption",
+    lokasi: "the Amerika Serikat",
+    tanggal: "23-12-2024",
+  },
+  
+  {
+    kategori: "Letusan Vulkanik Cataclysmic  (VEI 4)",
+    nama: "Fukutoku-Oka-no-Ba eruption",
+    lokasi: "Jepang",
+    tanggal: "13-08-2021",
+  },
+  
+  {
+    kategori: "Letusan Vulkanik Paroxysmal  (VEI 5)",
+    nama: "Hunga Tonga-Hunga Ha'apai eruption",
+    lokasi: "Tonga",
+    tanggal: "20-12-2021",
+  },
+  
+  {
+    kategori: "Letusan Vulkanik Colossal  (VEI 6)",
+    nama: "Pinatubo eruption",
+    lokasi: "the Philippines",
+    tanggal: "02-04-1991",
+  },
+  
+  {
+    kategori: "Letusan Vulkanik Mega-colossal  (VEI 7)",
+    nama: "Mount Tambora eruption",
+    lokasi: "Indonesia",
+    tanggal: "10-04-1815",
+  },
+  
+  {
+    kategori: "Letusan Vulkanik Apocalyptic  (VEI 8)",
+    nama: "Oruanui supereruption",
+    lokasi: "North Island, New Zealand",
+    tanggal: "26,500 tahun lalu",
+  },
+  
+  
+  
+  {
+    kategori: "1 Kiloton Asteroid Impact",
+    nama: "3.4 Kt asteroid impact",
+    lokasi: "Samudera Pasifik",
+    tanggal: "21-12-2024",
+  },
+  
+  {
+    kategori: "5 Kiloton Asteroid Impact",
+    nama: "5.1 Kt asteroid impact",
+    tanggal: "20-07-2024",
+  },
+  
+  {
+    kategori: "25 Kiloton Asteroid Impact",
+    nama: "49 Kt asteroid impact",
+    lokasi: "Laut Bering",
+    tanggal: "19-12-2018",
+  },
+  
+  {
+    kategori: "100 Kiloton Asteroid Impact",
+    nama: "440 Kt asteroid impact",
+    lokasi: "Chelyabinsk Obnama, Russia",
+    tanggal: "15-02-2013",
+  },
+  
+  {
+    kategori: "Megaton Asteroid Impact",
+    nama: "12 Mt asteroid impact",
+    lokasi: "Russia",
+    tanggal: "30-06-1908",
+  },
+  
+  {
+    kategori: "Gigaton Asteroid Impact",
+    nama: "2.3 Gt asteroid impact",
+    lokasi: "Kazakhstan",
+    tanggal: "900,000 tahun lalu",
+  },
+  
+  {
+    kategori: "Teraton Asteroid Impact",
+    nama: "1.75 Tt asteroid impact",
+    lokasi: "Chesapeake Bay, Virginia",
+    tanggal: "35 juta tahun lalu",
+  },
+  
+  
+  
   {
     kategori: "Typhoon",
     nama: "Typhoon Usagi",
-    tanggal: "9 November 2024",
+    lokasi: "Laut Filipina Timur",
+    tanggal: "09-11-2024",
   },
+  
   {
     kategori: "Super Typhoon",
     nama: "Super Typhoon Man-yi",
-    tanggal: "9 November 2024",
+    lokasi: "timur Atol Kwajalein, Filipina",
+    tanggal: "09-11-2024",
   },
+  
   {
-    kategori: "Category 1 Hurricane",
-    nama: "Category 1 Hurricane Oscar",
-    tanggal: "19 Oktober 2024",
+    kategori: "Badai Kategori 1",
+    nama: "Badai Kategori 1 Oscar",
+    lokasi: "Samudera Atlantik",
+    tanggal: "19-10-2024",
   },
+  
   {
-    kategori: "Category 5 Hurricane",
-    nama: "Category 5 Hurricane Milton",
-    tanggal: "5 Oktober 2024",
+    kategori: "Badai Kategori 2",
+    nama: "Badai Kategori 2 Leslie",
+    lokasi: "Samudera Atlantik",
+    tanggal: "02-10-2024",
   },
+  
   {
-    kategori: "Category 2 Hurricane",
-    nama: "Category 2 Hurricane Leslie",
-    tanggal: "2 Oktober 2024",
+    kategori: "Badai Kategori 3",
+    nama: "Badai Kategori 3 Calvin",
+    lokasi: "Samudera Atlantik",
+    tanggal: "11-07-2023",
   },
+  
   {
-    kategori: "Category 4 Hurricane",
-    nama: "Category 4 Hurricane Kirk",
-    tanggal: "29 September 2024",
+    kategori: "Badai Kategori 4",
+    nama: "Badai Kategori 4 Kirk",
+    lokasi: "Samudera Atlantik",
+    tanggal: "29-09-2024",
   },
+  
   {
-    kategori: "Tsunami",
-    nama: "17m High Tsunami",
-    lokasi: "Pedersen Lagoon, Alaska",
-    tanggal: "7 Agustus 2024",
+    kategori: "Badai Kategori 5",
+    nama: "Badai Kategori 5 Milton",
+    lokasi: "Laut Karibia Barat",
+    tanggal: "05-10-2024",
   },
+  
   {
-    kategori: "Kiloton Asteroid Impact",
-    nama: "5.1kt Asteroid Impact",
-    tanggal: "20 Juli 2024",
+    kategori: "Tornado EF4",
+    nama: "Tornado EF4",
+    lokasi: "Iowa, Amerika Serikat",
+    tanggal: "31-03-2023",
   },
+  
   {
-    kategori: "Solar Flare",
-    nama: "Class X5.8 Solar Flare",
-    tanggal: "11 Mei 2024",
+    kategori: "Tornado EF5",
+    nama: "Tornado EF5",
+    lokasi: "Oklahoma, Amerika Serikat",
+    tanggal: "20-05-2013",
   },
+  
+  
   {
-    kategori: "Extreme Geomagnetic Storm",
-    nama: "Extreme Geomagnetic Storm",
-    tanggal: "28 Oktober 2003",
+    kategori: "Kecelakaan Nuklir Besar",
+    nama: "Bencana Nuklir Fukushima",
+    lokasi: "Jepang",
+    tanggal: "11-03-2011",
   },
+  
   {
-    kategori: "Tsunami",
-    nama: "200m High Tsunami",
-    lokasi: "Dickson Fjord, Greenland",
-    tanggal: "16 September 2023",
-  },
-  {
-    kategori: "Tsunami",
-    nama: "200m High Megatsunami",
-    lokasi: "Dickson Fjord, Greenland",
-    tanggal: "16 September 2023",
-  },
-  {
-    kategori: "Category 3 Hurricane",
-    nama: "Category 3 Hurricane Calvin",
-    tanggal: "11 Juli 2023",
-  },
-  {
-    kategori: "Gravitational Wave Detected",
-    nama: "Gravitational Wave",
-    tanggal: "30 Mei 2023",
-  },
-  {
-    kategori: "EF4 Tornado",
-    nama: "EF4 Tornado",
-    lokasi: "Iowa, United States",
-    tanggal: "31 Maret 2023",
-  },
-  {
-    kategori: "Paroxysmal Volcanic Eruption (VEI 5)",
-    nama: "Hunga Tonga-Hunga Ha'apai Eruption",
-    lokasi: "Tonga",
-    tanggal: "20 Desember 2021",
-  },
-  {
-    kategori: "Cataclysmic Volcanic Eruption (VEI 4)",
-    nama: "Fukutoku-Oka-no-Ba Eruption",
-    lokasi: "Japan",
-    tanggal: "13 Agustus 2021",
-  },
-  {
-    kategori: "Earthquake",
-    nama: "Magnitude 8.1 Earthquake",
-    lokasi: "South Sandwich Islands Region",
-    tanggal: "13 Agustus 2021",
-  },
-  {
-    kategori: "Kiloton Asteroid Impact",
-    nama: "49kt Asteroid Impact",
-    lokasi: "Bering Sea",
-    tanggal: "19 Desember 2018",
-  },
-  {
-    kategori: "EF5 Tornado",
-    nama: "EF5 Tornado",
-    lokasi: "Oklahoma, United States",
-    tanggal: "20 Mei 2013",
-  },
-  {
-    kategori: "Kiloton Asteroid Impact",
-    nama: "440kt Asteroid Impact",
-    lokasi: "Chelyabinsk Oblast, Russia",
-    tanggal: "15 Februari 2013",
-  },
-  {
-    kategori: "Major Nuclear Accident",
-    nama: "Fukushima Nuclear Disaster",
-    lokasi: "Japan",
-    tanggal: "11 Maret 2011",
-  },
-  {
-    kategori: "Earthquake",
-    nama: "Magnitude 9.1 Earthquake",
-    lokasi: "East Coast of Japan",
-    tanggal: "11 Maret 2011",
-  },
-  {
-    kategori: "Colossal Volcanic Eruption (VEI 6)",
-    nama: "Pinatubo Eruption",
-    lokasi: "Philippines",
-    tanggal: "2 April 1991",
-  },
-  {
-    kategori: "Nuclear Weapon Lost",
-    nama: "Lost Nuclear Warheads",
-    lokasi: "Bear Island",
-    tanggal: "7 April 1989",
-  },
-  {
-    kategori: "Tsunami",
-    nama: "250m High Megatsunami",
-    lokasi: "Washington",
-    tanggal: "18 Mei 1980",
-  },
-  {
-    kategori: "Earthquake",
-    nama: "Estimated Magnitude 9.5 Earthquake",
-    lokasi: "Near Lumaco, Chile",
-    tanggal: "23 Mei 1960",
-  },
-  {
-    kategori: "Tsunami",
-    nama: "524.6m High Megatsunami",
-    lokasi: "Lituya Bay, Alaska",
-    tanggal: "10 Juli 1958",
-  },
-  {
-    kategori: "Megaton Asteroid Impact",
-    nama: "12Mt Asteroid Impact (Tunguska Event)",
-    lokasi: "Russia",
-    tanggal: "30 Juni 1908",
-  },
-  {
-    kategori: "Mega-colossal Volcanic Eruption (VEI 7)",
-    nama: "Mount Tambora Eruption",
-    lokasi: "Indonesia",
-    tanggal: "10 April 1815",
-  },
-  {
-    kategori: "Apocalyptic Volcanic Eruption (VEI 8)",
-    nama: "Oruanui Supereruption",
-    lokasi: "North Island, New Zealand",
-    tanggal: "26,500 years ago",
-  },
-  {
-    kategori: "Gigaton Asteroid Impact",
-    nama: "2.3Gt Asteroid Impact",
-    lokasi: "Kazakhstan",
-    tanggal: "900,000 years ago",
-  },
-  {
-    kategori: "Teraton Asteroid Impact",
-    nama: "1.75Tt Asteroid Impact",
-    lokasi: "Chesapeake Bay, Virginia",
-    tanggal: "35 million years ago",
+    kategori: "Senjata Nuklir Diluncurkan",
+    nama: "Fat Man",
+    lokasi: "Nagashaki, Jepang",
+    tanggal: "09-08-1945"
   },
 ];
 

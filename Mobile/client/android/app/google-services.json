@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1055937881822",
+    "project_id": "georadar-401bb",
+    "storage_bucket": "georadar-401bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1055937881822:android:5ada653ea08cb2cab0044f",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlRH-u6s1R9ju5o6dmNAW-z9Gio9CaJWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

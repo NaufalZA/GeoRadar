@@ -1,1 +1,4 @@
 API/node_modules/
+Mobile/Client/android/app/debug
+Mobile/Client/android/app/profile
+Mobile/Client/android/app/release
