@@ -208,7 +208,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
-                        child: EarthquakeMap(earthquake: latestQuake),
+                        child: EarthquakeMap(
+                          earthquake: latestQuake,
+                          userLocation: _userLocation,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16),

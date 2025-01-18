@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/earthquake.dart';
 
 class EarthquakeMap extends StatelessWidget {
   final Earthquake earthquake;
+  final Position? userLocation;
 
-  const EarthquakeMap({Key? key, required this.earthquake}) : super(key: key);
+  const EarthquakeMap({
+    Key? key, 
+    required this.earthquake,
+    this.userLocation,
+  }) : super(key: key);
 
   LatLng _parseCoordinates() {
     double lat = double.parse(earthquake.lintang.replaceAll(' LU', '').replaceAll(' LS', ''));
@@ -47,6 +53,17 @@ class EarthquakeMap extends StatelessWidget {
                   size: 40,
                 ),
               ),
+              if (userLocation != null)
+                Marker(
+                  point: LatLng(userLocation!.latitude, userLocation!.longitude),
+                  width: 80,
+                  height: 80,
+                  child: const Icon(
+                    Icons.person_pin_circle,
+                    color: Colors.blue,
+                    size: 40,
+                  ),
+                ),
             ],
           ),
         ],
