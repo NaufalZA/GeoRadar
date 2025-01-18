@@ -16,11 +16,26 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Earthquake>> _earthquakes;
   bool _isLocationPermissionGranted = false;
   Position? _userLocation;
+  final double _defaultLat = -6.89801698411407;
+  final double _defaultLong = 107.63581353819215;
 
   @override
   void initState() {
     super.initState();
     _earthquakes = _service.getRecentEarthquakes();
+    // Initialize with default location
+    _userLocation = Position(
+      latitude: _defaultLat,
+      longitude: _defaultLong,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,  // Add this line
+      headingAccuracy: 0, // Add this line
+    );
     _initializeLocation();
   }
 
@@ -29,6 +44,22 @@ class _HomeScreenState extends State<HomeScreen> {
       await _checkLocationPermission();
       if (_isLocationPermissionGranted) {
         await _getCurrentLocation();
+      } else {
+        // Set default location (ITENAS) if permission not granted
+        setState(() {
+          _userLocation = Position(
+            latitude: _defaultLat,
+            longitude: _defaultLong,
+            timestamp: DateTime.now(),
+            accuracy: 0,
+            altitude: 0,
+            heading: 0,
+            speed: 0,
+            speedAccuracy: 0,
+            altitudeAccuracy: 0,  // Add this line
+            headingAccuracy: 0, // Add this line
+          );
+        });
       }
     } catch (e) {
       debugPrint('Location initialization error: $e');
@@ -97,17 +128,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _getDistanceText(Earthquake earthquake) {
-    if (_userLocation == null) return '';
-    
-    // Parse latitude
     String lat = earthquake.lintang.replaceAll('°', '').trim();
     double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
-    if (lat.contains('LS')) latitude *= -1; // Convert South latitude to negative
+    if (lat.contains('LS')) latitude *= -1;
 
-    // Parse longitude
     String lon = earthquake.bujur.replaceAll('°', '').trim();
     double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
-    // BT (East) is positive by default, no need to modify
 
     double distanceInMeters = Geolocator.distanceBetween(
       _userLocation!.latitude,
@@ -116,10 +142,13 @@ class _HomeScreenState extends State<HomeScreen> {
       longitude,
     );
     
+    // Check if using default location (ITENAS)
+    String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
+    
     if (distanceInMeters >= 1000) {
-      return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari lokasi Anda';
+      return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari $locationLabel';
     } else {
-      return '${distanceInMeters.toStringAsFixed(0)} m dari lokasi Anda';
+      return '${distanceInMeters.toStringAsFixed(0)} m dari $locationLabel';
     }
   }
 
@@ -207,10 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               Text(latestQuake.dirasakan),
                             ],
-                            if (_userLocation != null) ...[
-                              const SizedBox(height: 8),
-                              Text(_getDistanceText(latestQuake)),
-                            ],
+                            const SizedBox(height: 8),
+                            Text(_getDistanceText(latestQuake)),
                           ],
                         ),
                       ),
