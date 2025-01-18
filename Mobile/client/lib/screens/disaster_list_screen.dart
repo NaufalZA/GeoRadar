@@ -20,7 +20,7 @@ class _DisasterListScreenState extends State<DisasterListScreen> {
   }
 
   Future<void> fetchDisasters() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:3000/api/bencana'));
+    final response = await http.get(Uri.parse('https://georadar.onrender.com/api/bencana'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       data.sort((a, b) {
