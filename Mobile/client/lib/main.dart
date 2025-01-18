@@ -45,6 +45,7 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
   bool _showAlert = false;
+  bool _isFirebaseAlert = false;  // tambahkan flag baru
   Map<String, dynamic>? _latestEarthquake;
   final EarthquakeService _earthquakeService = EarthquakeService();
   StreamSubscription? _alertSubscription;
@@ -60,13 +61,15 @@ class _MainNavigationState extends State<MainNavigation> {
   void _subscribeToAlertStatus() {
     debugPrint('Initializing Alert status subscription');
     _alertSubscription = EarthquakeAlertService.getAlertStatus().listen(
-      (showAlert) {
+      (showAlert) async {
         debugPrint('Received alert status from Firebase: $showAlert');
         if (showAlert) {
-          _checkForNearbyEarthquakes();
+          // Langsung tampilkan alert dari data gempa terbaru
+          await _showLatestEarthquakeAlert(isFirebaseAlert: true);
         } else {
           setState(() {
             _showAlert = false;
+            _isFirebaseAlert = false;
           });
         }
       },
@@ -74,6 +77,53 @@ class _MainNavigationState extends State<MainNavigation> {
         debugPrint('Error in alert subscription: $error');
       }
     );
+  }
+
+  Future<void> _showLatestEarthquakeAlert({bool isFirebaseAlert = false}) async {
+    try {
+      final earthquakes = await _earthquakeService.getRecentEarthquakes();
+      if (earthquakes.isEmpty) {
+        debugPrint('No earthquakes data available');
+        return;
+      }
+
+      final latestEarthquake = earthquakes.first;
+      final position = await EarthquakeAlertService.getCurrentLocation();
+      
+      // Convert coordinates
+      String lat = latestEarthquake.lintang.replaceAll('°', '').trim();
+      double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
+      if (lat.contains('LS')) latitude *= -1;
+
+      String lon = latestEarthquake.bujur.replaceAll('°', '').trim();
+      double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
+
+      double distance = 0;
+      if (position != null) {
+        distance = EarthquakeAlertService.calculateDistance(
+          position.latitude,
+          position.longitude,
+          latitude,
+          longitude,
+        );
+      }
+
+      setState(() {
+        _showAlert = true;
+        _isFirebaseAlert = isFirebaseAlert;
+        _latestEarthquake = {
+          'magnitude': latestEarthquake.magnitude,
+          'depth': double.parse(latestEarthquake.kedalaman.replaceAll(RegExp(r'[^0-9.]'), '')),
+          'distance': distance,
+          'wilayah': latestEarthquake.wilayah,
+          'isFirebaseAlert': isFirebaseAlert,
+        };
+      });
+      
+      debugPrint('Alert overlay activated: ${isFirebaseAlert ? "Firebase Alert" : "Proximity Alert"}');
+    } catch (e) {
+      debugPrint('Error showing earthquake alert: $e');
+    }
   }
 
   @override
@@ -92,14 +142,10 @@ class _MainNavigationState extends State<MainNavigation> {
 
     try {
       final earthquakes = await _earthquakeService.getRecentEarthquakes();
-      if (earthquakes.isEmpty) {
-        debugPrint('No earthquakes data available');
-        return;
-      }
+      if (earthquakes.isEmpty) return;
 
       final latestEarthquake = earthquakes.first;
       
-      // Convert coordinates to double
       String lat = latestEarthquake.lintang.replaceAll('°', '').trim();
       double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
       if (lat.contains('LS')) latitude *= -1;
@@ -115,16 +161,7 @@ class _MainNavigationState extends State<MainNavigation> {
       );
 
       if (distance <= EarthquakeAlertService.ALERT_RADIUS_KM) {
-        setState(() {
-          _showAlert = true;
-          _latestEarthquake = {
-            'magnitude': latestEarthquake.magnitude,
-            'depth': double.parse(latestEarthquake.kedalaman.replaceAll(RegExp(r'[^0-9.]'), '')),
-            'distance': distance,
-            'wilayah': latestEarthquake.wilayah,
-          };
-        });
-        debugPrint('Alert overlay activated with earthquake data');
+        await _showLatestEarthquakeAlert(isFirebaseAlert: false);
       }
     } catch (e) {
       debugPrint('Error checking nearby earthquakes: $e');

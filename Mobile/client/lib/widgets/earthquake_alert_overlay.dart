@@ -12,8 +12,10 @@ class EarthquakeAlertOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isFirebaseAlert = earthquake['isFirebaseAlert'] ?? false;
+
     return Material(
-      color: Colors.red.withOpacity(0.9),
+      color: isFirebaseAlert ? Colors.red.withOpacity(0.9) : Colors.orange.withOpacity(0.9),
       child: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -25,7 +27,7 @@ class EarthquakeAlertOverlay extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'PERINGATAN GEMPA BUMI!',
+              isFirebaseAlert ? 'PERINGATAN DARURAT!' : 'PERINGATAN GEMPA BUMI!',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
