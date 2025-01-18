@@ -5,14 +5,12 @@ import 'dart:convert';
 
 class DisasterListScreen extends StatefulWidget {
   const DisasterListScreen({Key? key}) : super(key: key);
-
   @override
   State<DisasterListScreen> createState() => _DisasterListScreenState();
 }
 
 class _DisasterListScreenState extends State<DisasterListScreen> {
   List<dynamic> disasters = [];
-
   @override
   void initState() {
     super.initState();
@@ -26,26 +24,22 @@ class _DisasterListScreenState extends State<DisasterListScreen> {
       data.sort((a, b) {
         String dateStrA = a['tanggal'];
         String dateStrB = b['tanggal'];
-        
-        // Try parsing as regular date first
+                
         try {
           DateTime dateA = DateFormat('dd-MM-yyyy').parse(dateStrA);
           DateTime dateB = DateFormat('dd-MM-yyyy').parse(dateStrB);
           return dateB.compareTo(dateA);
         } catch (e) {
-          // If parsing fails, handle historic dates
+          
           bool isYearsAgoA = dateStrA.contains('tahun lalu');
           bool isYearsAgoB = dateStrB.contains('tahun lalu');
-          
-          // If both are historic dates
+                    
           if (isYearsAgoA && isYearsAgoB) {
-            // Extract numbers and convert to comparable values
             int yearsA = extractYears(dateStrA);
             int yearsB = extractYears(dateStrB);
-            return yearsA.compareTo(yearsB); // Smaller numbers (more recent) come first
+            return yearsA.compareTo(yearsB); 
           }
-          
-          // Put regular dates before historic dates
+                    
           if (isYearsAgoA) return 1;
           if (isYearsAgoB) return -1;
           return 0;

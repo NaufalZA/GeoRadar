@@ -26,6 +26,29 @@ const dataSchema = new mongoose.Schema({
 });
 const dataModel = mongoose.model('data', dataSchema);
 
+app.get('/api/gempa', async (req, res) => {
+    try {
+        const response = await axios.get('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json');
+        const earthquakes = response.data.Infogempa.gempa;
+        
+        const magnitudes = earthquakes.map(quake => parseFloat(quake.Magnitude));
+        const avgMagnitude = magnitudes.reduce((a, b) => a + b, 0) / magnitudes.length;
+        
+        const depths = earthquakes.map(quake => parseInt(quake.Kedalaman.replace(' km', '')));
+        const avgDepth = depths.reduce((a, b) => a + b, 0) / depths.length;
+        
+        const processedData = {
+            averageMagnitude: avgMagnitude.toFixed(2),
+            averageDepth: avgDepth.toFixed(2) + ' km',
+        };
+        
+        res.json(processedData);
+    } catch (error) {
+        console.error('Error fetching BMKG data:', error);
+        res.status(500).json({ error: 'Gagal mengambil data BMKG' });
+    }
+});
+
 app.get('/api/bencana', async (req, res) => {
     try {
         const data = await dataModel.find();
@@ -55,29 +78,6 @@ app.post('/api/bencana', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Gagal menyimpan data', details: error.message });
-    }
-});
-
-app.get('/api/gempa', async (req, res) => {
-    try {
-        const response = await axios.get('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json');
-        const earthquakes = response.data.Infogempa.gempa;
-        
-        const magnitudes = earthquakes.map(quake => parseFloat(quake.Magnitude));
-        const avgMagnitude = magnitudes.reduce((a, b) => a + b, 0) / magnitudes.length;
-        
-        const depths = earthquakes.map(quake => parseInt(quake.Kedalaman.replace(' km', '')));
-        const avgDepth = depths.reduce((a, b) => a + b, 0) / depths.length;
-        
-        const processedData = {
-            averageMagnitude: avgMagnitude.toFixed(2),
-            averageDepth: avgDepth.toFixed(2) + ' km',
-        };
-        
-        res.json(processedData);
-    } catch (error) {
-        console.error('Error fetching BMKG data:', error);
-        res.status(500).json({ error: 'Gagal mengambil data BMKG' });
     }
 });
 
