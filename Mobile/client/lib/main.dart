@@ -10,6 +10,7 @@ import 'services/earthquake_alert_service.dart';
 import 'widgets/earthquake_alert_overlay.dart';
 import 'services/earthquake_service.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'screens/about_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -179,6 +180,7 @@ class _MainNavigationState extends State<MainNavigation> {
     const EarthquakeListScreen(),
     const DisasterListScreen(),
     const ProfileScreen(),
+    const AboutScreen(), // Add AboutScreen
   ];
 
   void _onItemTapped(int index) {
@@ -217,6 +219,10 @@ class _MainNavigationState extends State<MainNavigation> {
               NavigationDestination(
                 icon: Icon(Icons.person),
                 label: 'Profile',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.info),
+                label: 'About',
               ),
             ],
           ),
