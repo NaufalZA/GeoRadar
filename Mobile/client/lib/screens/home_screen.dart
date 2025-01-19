@@ -4,6 +4,7 @@ import '../models/earthquake.dart';
 import '../services/earthquake_service.dart';
 import '../services/earthquake_alert_service.dart';
 import '../widgets/earthquake_map.dart';
+import '../utils/string_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -343,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        latestQuake.wilayah,
+                                        formatEarthquakeLocation(latestQuake.wilayah),
                                         style: const TextStyle(
                                           fontSize: 16,
                                         ),

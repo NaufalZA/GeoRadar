@@ -4,6 +4,7 @@ import '../models/earthquake.dart';
 import '../models/earthquake_stats.dart';
 import '../services/earthquake_service.dart';
 import '../services/earthquake_alert_service.dart';
+import '../utils/string_utils.dart';
 
 class EarthquakeListScreen extends StatefulWidget {
   const EarthquakeListScreen({Key? key}) : super(key: key);
@@ -130,7 +131,7 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        quake.wilayah,
+                        formatEarthquakeLocation(quake.wilayah),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
