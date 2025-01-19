@@ -182,14 +182,40 @@ class _MainNavigationState extends State<MainNavigation> {
             children: _screens,
           ),
           bottomNavigationBar: NavigationBar(
+            height: 65,
+            elevation: 3,
             selectedIndex: _selectedIndex,
             onDestinationSelected: _onItemTapped,
-            destinations: const [
-              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-              NavigationDestination(icon: Icon(Icons.radar_outlined), label: 'Gempa Bumi'),
-              NavigationDestination(icon: Icon(Icons.warning_amber_rounded), label: 'Bencana'),
-              NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-              NavigationDestination(icon: Icon(Icons.info), label: 'About'),
+            backgroundColor: Colors.white,
+            indicatorColor: Colors.blue.withOpacity(0.2),
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            animationDuration: const Duration(milliseconds: 500),
+            destinations: [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined, color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
+                selectedIcon: Icon(Icons.home, color: Colors.blue),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.radar_outlined, color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+                selectedIcon: Icon(Icons.radar, color: Colors.blue),
+                label: 'Gempa Bumi',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.warning_outlined, color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
+                selectedIcon: Icon(Icons.warning, color: Colors.blue),
+                label: 'Bencana',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person_outline, color: _selectedIndex == 3 ? Colors.blue : Colors.grey),
+                selectedIcon: Icon(Icons.person, color: Colors.blue),
+                label: 'Profile',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.info_outline, color: _selectedIndex == 4 ? Colors.blue : Colors.grey),
+                selectedIcon: Icon(Icons.info, color: Colors.blue),
+                label: 'About',
+              ),
             ],
           ),
         ),
