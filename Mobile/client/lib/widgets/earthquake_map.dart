@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/earthquake.dart';
+import 'pulsating_marker.dart';
 
 class EarthquakeMap extends StatefulWidget {
   final Earthquake earthquake;
@@ -113,12 +114,11 @@ class _EarthquakeMapState extends State<EarthquakeMap> {
             markers: [
               Marker(
                 point: quakeLocation,
-                width: 80,
-                height: 80,
-                child: Icon(
-                  Icons.location_on,
-                  color: Colors.red[700],
-                  size: 40,
+                width: 50,
+                height: 50,
+                child: const PulsatingMarker(
+                  size: 15,
+                  color: Colors.red,
                 ),
               ),
               if (widget.userLocation != null)
