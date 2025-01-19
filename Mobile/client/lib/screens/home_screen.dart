@@ -227,29 +227,182 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Magnitude ${latestQuake.magnitude}',
-                              style: Theme.of(context).textTheme.headlineSmall,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                // Magnitudo
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.graphic_eq, color: Colors.orange, size: 20),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          latestQuake.magnitude,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Magnitudo',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                // Kedalaman
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.arrow_downward, color: Colors.green, size: 20),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          latestQuake.kedalaman,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Kedalaman',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                // Koordinat
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.place, color: Colors.red, size: 20),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          latestQuake.lintang,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      latestQuake.bujur,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              latestQuake.wilayah,
-                              style: Theme.of(context).textTheme.titleMedium,
+                            const SizedBox(height: 16),
+                            const Divider(),
+                            const SizedBox(height: 16),
+                            // Waktu
+                            Row(
+                              children: [
+                                const Icon(Icons.access_time, size: 24, color: Colors.grey),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Waktu',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${latestQuake.tanggal}, ${latestQuake.jam}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text('Waktu: ${latestQuake.tanggal} ${latestQuake.jam}'),
-                            Text('Koordinat: ${latestQuake.lintang}, ${latestQuake.bujur}'),
-                            Text('Kedalaman: ${latestQuake.kedalaman}'),
+                            const SizedBox(height: 16),
+                            // Lokasi
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on, size: 24, color: Colors.orange),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Lokasi Gempa',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        latestQuake.wilayah,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                             if (latestQuake.dirasakan.isNotEmpty) ...[
-                              const SizedBox(height: 12),
-                              Text(
-                                'Dirasakan:',
-                                style: Theme.of(context).textTheme.titleMedium,
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  const Icon(Icons.info, size: 24, color: Colors.blue),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Wilayah Dirasakan',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          latestQuake.dirasakan,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(latestQuake.dirasakan),
                             ],
-                            const SizedBox(height: 8),
-                            Text(_getDistanceText(latestQuake)),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                const Icon(Icons.directions, size: 24, color: Colors.green),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Jarak',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _getDistanceText(latestQuake),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
