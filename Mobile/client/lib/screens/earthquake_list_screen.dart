@@ -103,83 +103,62 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: magnitudeColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: magnitudeColor),
-                  ),
-                  child: Text(
-                    'M${quake.magnitude}',
-                    style: TextStyle(
-                      color: magnitudeColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: magnitudeColor.withOpacity(0.2),
+                border: Border.all(color: magnitudeColor, width: 2),
+              ),
+              child: Center(
+                child: Text(
+                  quake.magnitude,
+                  style: TextStyle(
+                    color: magnitudeColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    formatEarthquakeLocation(quake.wilayah),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
                     children: [
+                      const Icon(Icons.calendar_month_outlined, size: 16, color: Colors.blue),
+                      const SizedBox(width: 4),
                       Text(
-                        formatEarthquakeLocation(quake.wilayah),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.schedule_outlined, size: 16, color: Colors.orange),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${quake.tanggal} ${quake.jam}',
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        ],
+                        '${quake.tanggal} ${quake.jam}'
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            const Divider(height: 1),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.waves_outlined, size: 16, color: Color.fromARGB(255, 53, 46, 255)),
-                    const SizedBox(width: 4),
-                    Text(
-                      quake.kedalaman,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.explore_outlined, size: 16, color: Colors.orange),
-                    const SizedBox(width: 4),
-                    Text(
-                      _getDistanceText(quake),
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.explore_outlined, size: 16, color: Colors.red),
+                      const SizedBox(width: 4),
+                      Text(
+                        _getDistanceText(quake),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -217,27 +196,96 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
             builder: (context, statsSnapshot) {
               if (statsSnapshot.hasData) {
                 return Card(
-                  margin: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(12),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Column(
                           children: [
-                            const Text('Rata-rata Magnitudo'),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 247, 32, 32).withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.radar_outlined,
+                                color: Color.fromARGB(255, 247, 32, 32),
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
                             Text(
-                              statsSnapshot.data!.averageMagnitude.toStringAsFixed(2),
-                              style: Theme.of(context).textTheme.titleLarge,
+                              statsSnapshot.data!.averageMagnitude.toStringAsFixed(1),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 247, 32, 32),
+                              ),
+                            ),
+                            const Text(
+                              'Rata-Rata',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const Text(
+                              'Magnitudo',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
                         ),
+                        Container(
+                          height: 80,
+                          width: 1,
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
                         Column(
                           children: [
-                            const Text('Rata-rata Kedalaman'),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.waves_outlined,
+                                color: Colors.blue,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
                             Text(
-                              '${statsSnapshot.data!.averageDepth.toStringAsFixed(2)} km',
-                              style: Theme.of(context).textTheme.titleLarge,
+                              '${statsSnapshot.data!.averageDepth.toStringAsFixed(1)}',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            ),
+                            const Text(
+                              'Rata-Rata',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const Text(
+                              'Kedalaman',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
                         ),

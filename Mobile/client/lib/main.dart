@@ -186,7 +186,7 @@ class _MainNavigationState extends State<MainNavigation> {
             onDestinationSelected: _onItemTapped,
             destinations: const [
               NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-              NavigationDestination(icon: Icon(Icons.list), label: 'Daftar Gempa'),
+              NavigationDestination(icon: Icon(Icons.radar_outlined), label: 'Gempa Bumi'),
               NavigationDestination(icon: Icon(Icons.warning_amber_rounded), label: 'Bencana'),
               NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
               NavigationDestination(icon: Icon(Icons.info), label: 'About'),
