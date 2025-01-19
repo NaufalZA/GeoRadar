@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/earthquake.dart';
 import '../models/earthquake_stats.dart';
 import '../services/earthquake_service.dart';
+import '../services/earthquake_alert_service.dart';
 
 class EarthquakeListScreen extends StatefulWidget {
   const EarthquakeListScreen({Key? key}) : super(key: key);
@@ -14,12 +16,77 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
   final EarthquakeService _service = EarthquakeService();
   late Future<List<Earthquake>> _earthquakes;
   late Future<EarthquakeStats> _stats;
+  bool _isLocationPermissionGranted = false;
+  Position? _userLocation;
+  final double _defaultLat = -6.89801698411407;
+  final double _defaultLong = 107.63581353819215;
 
   @override
   void initState() {
     super.initState();
     _earthquakes = _service.getRecentEarthquakes();
     _stats = _service.getEarthquakeStats();
+    _userLocation = Position(
+      latitude: _defaultLat,
+      longitude: _defaultLong,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    _initializeLocation();
+  }
+
+  Future<void> _initializeLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return;
+      }
+
+      if (permission == LocationPermission.deniedForever) return;
+
+      Position position = await EarthquakeAlertService.getCurrentLocation();
+      setState(() {
+        _userLocation = position;
+        _isLocationPermissionGranted = position.latitude != _defaultLat || 
+                                     position.longitude != _defaultLong;
+      });
+    } catch (e) {
+      debugPrint('Location initialization error: $e');
+    }
+  }
+
+  String _getDistanceText(Earthquake earthquake) {
+    String lat = earthquake.lintang.replaceAll('°', '').trim();
+    double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
+    if (lat.contains('LS')) latitude *= -1;
+
+    String lon = earthquake.bujur.replaceAll('°', '').trim();
+    double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
+
+    double distanceInMeters = Geolocator.distanceBetween(
+      _userLocation!.latitude,
+      _userLocation!.longitude,
+      latitude,
+      longitude,
+    );
+    
+    String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
+    
+    if (distanceInMeters >= 1000) {
+      return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari $locationLabel';
+    } else {
+      return '${distanceInMeters.toStringAsFixed(0)} m dari $locationLabel';
+    }
   }
 
   @override
@@ -28,6 +95,12 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
       appBar: AppBar(
         title: const Text('Daftar Gempa Dirasakan'),
         actions: [
+          if (!_isLocationPermissionGranted)
+            IconButton(
+              icon: const Icon(Icons.location_disabled),
+              onPressed: _initializeLocation,
+              tooltip: 'Enable Location',
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -101,9 +174,7 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('${quake.tanggal} ${quake.jam}'),
-                            Text('Kedalaman: ${quake.kedalaman}'),
-                            if (quake.dirasakan.isNotEmpty)
-                              Text('Dirasakan: ${quake.dirasakan}'),
+                            Text(_getDistanceText(quake)),
                           ],
                         ),
                         isThreeLine: true,
