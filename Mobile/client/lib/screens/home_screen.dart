@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.graphic_eq, color: Colors.orange, size: 20),
+                                        const Icon(Icons.radar_outlined, color: Color.fromARGB(255, 247, 32, 32), size: 20),
                                         const SizedBox(width: 4),
                                         Text(
                                           latestQuake.magnitude,
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.arrow_downward, color: Colors.green, size: 20),
+                                        const Icon(Icons.waves_outlined, color: Color.fromARGB(255, 53, 46, 255), size: 20),
                                         const SizedBox(width: 4),
                                         Text(
                                           latestQuake.kedalaman,
@@ -281,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.place, color: Colors.red, size: 20),
+                                        const Icon(Icons.location_on_outlined, color: Color.fromARGB(255, 247, 32, 32), size: 20),
                                         const SizedBox(width: 4),
                                         Text(
                                           latestQuake.lintang,
@@ -307,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             // Waktu
                             Row(
                               children: [
-                                const Icon(Icons.access_time, size: 24, color: Colors.grey),
+                                const Icon(Icons.schedule_outlined, size: 24, color: Colors.orange),
                                 const SizedBox(width: 12),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             // Lokasi
                             Row(
                               children: [
-                                const Icon(Icons.location_on, size: 24, color: Colors.orange),
+                                const Icon(Icons.location_on_outlined, size: 24, color: Colors.orange),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -357,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 16),
                               Row(
                                 children: [
-                                  const Icon(Icons.info, size: 24, color: Colors.blue),
+                                  const Icon(Icons.info_outline, size: 24, color: Colors.orange),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 16),
                             Row(
                               children: [
-                                const Icon(Icons.directions, size: 24, color: Colors.green),
+                                const Icon(Icons.explore_outlined, size: 24, color: Colors.orange),
                                 const SizedBox(width: 12),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
