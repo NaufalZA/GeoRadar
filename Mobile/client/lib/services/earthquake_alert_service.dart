@@ -10,6 +10,9 @@ class EarthquakeAlertService {
     databaseURL: 'https://georadar-401bb-default-rtdb.asia-southeast1.firebasedatabase.app',
   ).ref();
   
+  static const double _defaultLat = -6.89801698411407;
+  static const double _defaultLong = 107.63581353819215;
+
   static Stream<bool> getAlertStatus() {
     final alertRef = _database.child('Alert');
     debugPrint('Subscribing to Alert status from Firebase');
@@ -25,21 +28,55 @@ class EarthquakeAlertService {
     });
   }
   
-  static Future<Position?> getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return null;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
+  static Future<Position> getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      debugPrint('Location service enabled: $serviceEnabled');
+      
+      if (!serviceEnabled) {
+        debugPrint('Using default location (service disabled)');
+        return _getDefaultPosition();
       }
-    }
 
-    return await Geolocator.getCurrentPosition();
+      LocationPermission permission = await Geolocator.checkPermission();
+      debugPrint('Initial permission status: $permission');
+      
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        debugPrint('Permission after request: $permission');
+        if (permission == LocationPermission.denied) {
+          debugPrint('Using default location (permission denied)');
+          return _getDefaultPosition();
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        debugPrint('Using default location (permission denied forever)');
+        return _getDefaultPosition();
+      }
+
+      final position = await Geolocator.getCurrentPosition();
+      debugPrint('Got current location: ${position.latitude}, ${position.longitude}');
+      return position;
+    } catch (e) {
+      debugPrint('Error getting location: $e');
+      return _getDefaultPosition();
+    }
+  }
+
+  static Position _getDefaultPosition() {
+    return Position(
+      latitude: _defaultLat,
+      longitude: _defaultLong,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
   }
 
   static double calculateDistance(double lat1, double lon1, dynamic lat2, dynamic lon2) {

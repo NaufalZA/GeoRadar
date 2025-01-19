@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/earthquake.dart';
 import '../services/earthquake_service.dart';
+import '../services/earthquake_alert_service.dart';  // Add this import
 import '../widgets/earthquake_map.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,51 +19,56 @@ class _HomeScreenState extends State<HomeScreen> {
   Position? _userLocation;
   final double _defaultLat = -6.89801698411407;
   final double _defaultLong = 107.63581353819215;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _earthquakes = _service.getRecentEarthquakes();
-    // Initialize with default location
-    _userLocation = Position(
-      latitude: _defaultLat,
-      longitude: _defaultLong,
-      timestamp: DateTime.now(),
-      accuracy: 0,
-      altitude: 0,
-      heading: 0,
-      speed: 0,
-      speedAccuracy: 0,
-      altitudeAccuracy: 0,  // Add this line
-      headingAccuracy: 0, // Add this line
-    );
-    _initializeLocation();
+    _initializeLocation().then((_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   Future<void> _initializeLocation() async {
     try {
+      debugPrint('Initializing location...');
       await _checkLocationPermission();
+      debugPrint('Permission granted: $_isLocationPermissionGranted');
+      
       if (_isLocationPermissionGranted) {
         await _getCurrentLocation();
       } else {
-        // Set default location (ITENAS) if permission not granted
-        setState(() {
-          _userLocation = Position(
-            latitude: _defaultLat,
-            longitude: _defaultLong,
-            timestamp: DateTime.now(),
-            accuracy: 0,
-            altitude: 0,
-            heading: 0,
-            speed: 0,
-            speedAccuracy: 0,
-            altitudeAccuracy: 0,  // Add this line
-            headingAccuracy: 0, // Add this line
-          );
-        });
+        _setDefaultLocation();
       }
     } catch (e) {
       debugPrint('Location initialization error: $e');
+      _setDefaultLocation();
+    }
+  }
+
+  void _setDefaultLocation() {
+    debugPrint('Setting default location (ITENAS)');
+    if (mounted) {
+      setState(() {
+        _userLocation = Position(
+          latitude: _defaultLat,
+          longitude: _defaultLong,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          heading: 0,
+          speed: 0,
+          speedAccuracy: 0,
+          altitudeAccuracy: 0,
+          headingAccuracy: 0,
+        );
+        _isLocationPermissionGranted = false;
+      });
     }
   }
 
@@ -112,43 +118,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 5),
-      ).then((Position position) {
+      debugPrint('Getting current location...');
+      final position = await EarthquakeAlertService.getCurrentLocation();
+      
+      if (mounted) {
         setState(() {
           _userLocation = position;
+          _isLocationPermissionGranted = position.latitude != _defaultLat || 
+                                       position.longitude != _defaultLong;
         });
-      }).catchError((e) {
-        debugPrint('Position error: $e');
-      });
+      }
+      debugPrint('Location set to: ${position.latitude}, ${position.longitude}');
     } catch (e) {
       debugPrint('Error getting location: $e');
+      _setDefaultLocation();
     }
   }
 
   String _getDistanceText(Earthquake earthquake) {
-    String lat = earthquake.lintang.replaceAll('°', '').trim();
-    double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
-    if (lat.contains('LS')) latitude *= -1;
-
-    String lon = earthquake.bujur.replaceAll('°', '').trim();
-    double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
-
-    double distanceInMeters = Geolocator.distanceBetween(
-      _userLocation!.latitude,
-      _userLocation!.longitude,
-      latitude,
-      longitude,
-    );
+    if (_userLocation == null) return '';
     
-    // Check if using default location (ITENAS)
-    String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
-    
-    if (distanceInMeters >= 1000) {
-      return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari $locationLabel';
-    } else {
-      return '${distanceInMeters.toStringAsFixed(0)} m dari $locationLabel';
+    try {
+      String lat = earthquake.lintang.replaceAll('°', '').trim();
+      double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
+      if (lat.contains('LS')) latitude *= -1;
+
+      String lon = earthquake.bujur.replaceAll('°', '').trim();
+      double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
+
+      double distanceInMeters = Geolocator.distanceBetween(
+        _userLocation!.latitude,
+        _userLocation!.longitude,
+        latitude,
+        longitude,
+      );
+      
+      String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
+      
+      if (distanceInMeters >= 1000) {
+        return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari $locationLabel';
+      } else {
+        return '${distanceInMeters.toStringAsFixed(0)} m dari $locationLabel';
+      }
+    } catch (e) {
+      debugPrint('Error calculating distance: $e');
+      return '';
     }
   }
 
@@ -208,10 +222,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
-                        child: EarthquakeMap(
-                          earthquake: latestQuake,
-                          userLocation: _userLocation,
-                        ),
+                        child: _isLoading 
+                          ? const SizedBox(
+                              height: 300,
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                          : EarthquakeMap(
+                              earthquake: latestQuake,
+                              userLocation: _userLocation,
+                            ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -240,7 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(latestQuake.dirasakan),
                             ],
                             const SizedBox(height: 8),
-                            Text(_getDistanceText(latestQuake)),
+                            _isLoading 
+                              ? const Text('Menghitung jarak...')
+                              : Text(_getDistanceText(latestQuake)),
                           ],
                         ),
                       ),
