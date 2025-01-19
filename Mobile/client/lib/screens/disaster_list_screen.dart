@@ -66,7 +66,7 @@ class _DisasterListScreenState extends State<DisasterListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daftar Bencana'),
+        title: const Text('Hari Pasca Bencana'),
       ),
       body: ListView.builder(
         itemCount: disasters.length,

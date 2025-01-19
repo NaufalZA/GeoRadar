@@ -40,6 +40,7 @@ dependencies:
   geolocator: ^11.0.0
   firebase_database: ^11.3.0
   url_launcher: ^6.2.4 # Update to this specific version
+  font_awesome_flutter: ^10.6.0
 
 dev_dependencies:
   flutter_test:

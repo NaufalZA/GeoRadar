@@ -170,7 +170,7 @@ class _EarthquakeListScreenState extends State<EarthquakeListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daftar Gempa Dirasakan'),
+        title: const Text('Gempa Dirasakan'),
         actions: [
           if (!_isLocationPermissionGranted)
             IconButton(
