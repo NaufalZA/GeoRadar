@@ -18,7 +18,8 @@ class _DisasterListScreenState extends State<DisasterListScreen> {
   }
 
   Future<void> fetchDisasters() async {
-    final response = await http.get(Uri.parse('https://georadar.onrender.com/api/bencana'));
+    // final response = await http.get(Uri.parse('https://georadar.onrender.com/api/bencana'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:3000/api/bencana'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       data.sort((a, b) {
@@ -72,22 +73,35 @@ class _DisasterListScreenState extends State<DisasterListScreen> {
         itemCount: disasters.length,
         itemBuilder: (context, index) {
           final disaster = disasters[index];
+          
+          // Format days display
+          String daysDisplay = '';
+          int days = disaster['hari'];
+          daysDisplay = '$days hari';
+          
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: ListTile(
               title: Text(
-                disaster['nama'],
+                'Hari Pasca ${disaster['kategori']}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(
-                '${disaster['lokasi']}\n${disaster['tanggal']}',
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    daysDisplay,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  Text(
+                    'Terakhir: ${disaster['nama']} di ${disaster['lokasi']}, pada ${disaster['tanggal']}',
+                  ),
+                ],
               ),
-              leading: const Icon(Icons.warning_amber_rounded),
-              trailing: Text(
-                disaster['kategori'],
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              ),
-              isThreeLine: true,
             ),
           );
         },
