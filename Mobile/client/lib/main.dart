@@ -9,7 +9,6 @@ import 'screens/disaster_list_screen.dart';
 import 'services/earthquake_alert_service.dart';
 import 'widgets/earthquake_alert_overlay.dart';
 import 'services/earthquake_service.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'screens/about_screen.dart';
 
 void main() async {
@@ -46,26 +45,23 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
   bool _showAlert = false;
-  bool _isFirebaseAlert = false;  // tambahkan flag baru
+  bool _isFirebaseAlert = false;
   Map<String, dynamic>? _latestEarthquake;
   final EarthquakeService _earthquakeService = EarthquakeService();
   StreamSubscription? _alertSubscription;
-  
+
   @override
   void initState() {
     super.initState();
-    _selectedIndex = 0; // Ensure initial index is valid
+    _selectedIndex = 0;
     _checkForNearbyEarthquakes();
     _subscribeToAlertStatus();
   }
 
   void _subscribeToAlertStatus() {
-    debugPrint('Initializing Alert status subscription');
     _alertSubscription = EarthquakeAlertService.getAlertStatus().listen(
       (showAlert) async {
-        debugPrint('Received alert status from Firebase: $showAlert');
         if (showAlert) {
-          // Langsung tampilkan alert dari data gempa terbaru
           await _showLatestEarthquakeAlert(isFirebaseAlert: true);
         } else {
           setState(() {
@@ -74,9 +70,7 @@ class _MainNavigationState extends State<MainNavigation> {
           });
         }
       },
-      onError: (error) {
-        debugPrint('Error in alert subscription: $error');
-      }
+      onError: (error) {},
     );
   }
 
@@ -84,14 +78,12 @@ class _MainNavigationState extends State<MainNavigation> {
     try {
       final earthquakes = await _earthquakeService.getRecentEarthquakes();
       if (earthquakes.isEmpty) {
-        debugPrint('No earthquakes data available');
         return;
       }
 
       final latestEarthquake = earthquakes.first;
       final position = await EarthquakeAlertService.getCurrentLocation();
-      
-      // Convert coordinates
+
       String lat = latestEarthquake.lintang.replaceAll('°', '').trim();
       double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
       if (lat.contains('LS')) latitude *= -1;
@@ -99,15 +91,12 @@ class _MainNavigationState extends State<MainNavigation> {
       String lon = latestEarthquake.bujur.replaceAll('°', '').trim();
       double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
 
-      double distance = 0;
-      if (position != null) {
-        distance = EarthquakeAlertService.calculateDistance(
-          position.latitude,
-          position.longitude,
-          latitude,
-          longitude,
-        );
-      }
+      double distance = EarthquakeAlertService.calculateDistance(
+        position.latitude,
+        position.longitude,
+        latitude,
+        longitude,
+      );
 
       setState(() {
         _showAlert = true;
@@ -120,11 +109,7 @@ class _MainNavigationState extends State<MainNavigation> {
           'isFirebaseAlert': isFirebaseAlert,
         };
       });
-      
-      debugPrint('Alert overlay activated: ${isFirebaseAlert ? "Firebase Alert" : "Proximity Alert"}');
-    } catch (e) {
-      debugPrint('Error showing earthquake alert: $e');
-    }
+    } catch (e) {}
   }
 
   @override
@@ -134,10 +119,8 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   Future<void> _checkForNearbyEarthquakes() async {
-    debugPrint('Checking for nearby earthquakes...');
     final position = await EarthquakeAlertService.getCurrentLocation();
     if (position == null) {
-      debugPrint('Failed to get current location');
       return;
     }
 
@@ -146,7 +129,7 @@ class _MainNavigationState extends State<MainNavigation> {
       if (earthquakes.isEmpty) return;
 
       final latestEarthquake = earthquakes.first;
-      
+
       String lat = latestEarthquake.lintang.replaceAll('°', '').trim();
       double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
       if (lat.contains('LS')) latitude *= -1;
@@ -164,9 +147,7 @@ class _MainNavigationState extends State<MainNavigation> {
       if (distance <= EarthquakeAlertService.ALERT_RADIUS_KM) {
         await _showLatestEarthquakeAlert(isFirebaseAlert: false);
       }
-    } catch (e) {
-      debugPrint('Error checking nearby earthquakes: $e');
-    }
+    } catch (e) {}
   }
 
   void _dismissAlert() {
@@ -180,7 +161,7 @@ class _MainNavigationState extends State<MainNavigation> {
     const EarthquakeListScreen(),
     const DisasterListScreen(),
     const ProfileScreen(),
-    const AboutScreen(), // Add AboutScreen
+    const AboutScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -204,26 +185,11 @@ class _MainNavigationState extends State<MainNavigation> {
             selectedIndex: _selectedIndex,
             onDestinationSelected: _onItemTapped,
             destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.list),
-                label: 'Daftar Gempa',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.warning_amber_rounded),
-                label: 'Bencana',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.info),
-                label: 'About',
-              ),
+              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+              NavigationDestination(icon: Icon(Icons.list), label: 'Daftar Gempa'),
+              NavigationDestination(icon: Icon(Icons.warning_amber_rounded), label: 'Bencana'),
+              NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+              NavigationDestination(icon: Icon(Icons.info), label: 'About'),
             ],
           ),
         ),

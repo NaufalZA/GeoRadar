@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/earthquake.dart';
 import '../services/earthquake_service.dart';
-import '../services/earthquake_alert_service.dart';  // Add this import
+import '../services/earthquake_alert_service.dart';
 import '../widgets/earthquake_map.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _earthquakes = _service.getRecentEarthquakes();
-    // Initialize with default location
     _userLocation = Position(
       latitude: _defaultLat,
       longitude: _defaultLong,
@@ -34,21 +33,18 @@ class _HomeScreenState extends State<HomeScreen> {
       heading: 0,
       speed: 0,
       speedAccuracy: 0,
-      altitudeAccuracy: 0,  // Add this line
-      headingAccuracy: 0, // Add this line
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
     );
     _initializeLocation();
   }
 
   Future<void> _initializeLocation() async {
     try {
-      debugPrint('Initializing location...');
       await _checkLocationPermission();
-      debugPrint('Permission granted: $_isLocationPermissionGranted');
       if (_isLocationPermissionGranted) {
         await _getCurrentLocation();
       } else {
-        debugPrint('Setting default location (ITENAS)');
         setState(() {
           _userLocation = Position(
             latitude: _defaultLat,
@@ -59,8 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
             heading: 0,
             speed: 0,
             speedAccuracy: 0,
-            altitudeAccuracy: 0,  // Add this line
-            headingAccuracy: 0, // Add this line
+            altitudeAccuracy: 0,
+            headingAccuracy: 0,
           );
         });
       }
@@ -115,16 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      debugPrint('Getting current location...');
       Position position = await EarthquakeAlertService.getCurrentLocation();
-      debugPrint('Location received: ${position.latitude}, ${position.longitude}');
-      debugPrint('Default location: $_defaultLat, $_defaultLong');
-      
       setState(() {
         _userLocation = position;
         _isLocationPermissionGranted = position.latitude != _defaultLat || 
                                      position.longitude != _defaultLong;
-        debugPrint('Using default location: ${!_isLocationPermissionGranted}');
       });
     } catch (e) {
       debugPrint('Error getting location: $e');
@@ -161,7 +152,6 @@ class _HomeScreenState extends State<HomeScreen> {
       longitude,
     );
     
-    // Check if using default location (ITENAS)
     String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
     
     if (distanceInMeters >= 1000) {
