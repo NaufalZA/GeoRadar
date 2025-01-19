@@ -19,19 +19,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Position? _userLocation;
   final double _defaultLat = -6.89801698411407;
   final double _defaultLong = 107.63581353819215;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _earthquakes = _service.getRecentEarthquakes();
-    _initializeLocation().then((_) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    });
+    // Initialize with default location
+    _userLocation = Position(
+      latitude: _defaultLat,
+      longitude: _defaultLong,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,  // Add this line
+      headingAccuracy: 0, // Add this line
+    );
+    _initializeLocation();
   }
 
   Future<void> _initializeLocation() async {
@@ -39,36 +45,27 @@ class _HomeScreenState extends State<HomeScreen> {
       debugPrint('Initializing location...');
       await _checkLocationPermission();
       debugPrint('Permission granted: $_isLocationPermissionGranted');
-      
       if (_isLocationPermissionGranted) {
         await _getCurrentLocation();
       } else {
-        _setDefaultLocation();
+        debugPrint('Setting default location (ITENAS)');
+        setState(() {
+          _userLocation = Position(
+            latitude: _defaultLat,
+            longitude: _defaultLong,
+            timestamp: DateTime.now(),
+            accuracy: 0,
+            altitude: 0,
+            heading: 0,
+            speed: 0,
+            speedAccuracy: 0,
+            altitudeAccuracy: 0,  // Add this line
+            headingAccuracy: 0, // Add this line
+          );
+        });
       }
     } catch (e) {
       debugPrint('Location initialization error: $e');
-      _setDefaultLocation();
-    }
-  }
-
-  void _setDefaultLocation() {
-    debugPrint('Setting default location (ITENAS)');
-    if (mounted) {
-      setState(() {
-        _userLocation = Position(
-          latitude: _defaultLat,
-          longitude: _defaultLong,
-          timestamp: DateTime.now(),
-          accuracy: 0,
-          altitude: 0,
-          heading: 0,
-          speed: 0,
-          speedAccuracy: 0,
-          altitudeAccuracy: 0,
-          headingAccuracy: 0,
-        );
-        _isLocationPermissionGranted = false;
-      });
     }
   }
 
@@ -119,50 +116,58 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       debugPrint('Getting current location...');
-      final position = await EarthquakeAlertService.getCurrentLocation();
+      Position position = await EarthquakeAlertService.getCurrentLocation();
+      debugPrint('Location received: ${position.latitude}, ${position.longitude}');
+      debugPrint('Default location: $_defaultLat, $_defaultLong');
       
-      if (mounted) {
-        setState(() {
-          _userLocation = position;
-          _isLocationPermissionGranted = position.latitude != _defaultLat || 
-                                       position.longitude != _defaultLong;
-        });
-      }
-      debugPrint('Location set to: ${position.latitude}, ${position.longitude}');
+      setState(() {
+        _userLocation = position;
+        _isLocationPermissionGranted = position.latitude != _defaultLat || 
+                                     position.longitude != _defaultLong;
+        debugPrint('Using default location: ${!_isLocationPermissionGranted}');
+      });
     } catch (e) {
       debugPrint('Error getting location: $e');
-      _setDefaultLocation();
+      setState(() {
+        _userLocation = Position(
+          latitude: _defaultLat,
+          longitude: _defaultLong,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          heading: 0,
+          speed: 0,
+          speedAccuracy: 0,
+          altitudeAccuracy: 0,
+          headingAccuracy: 0,
+        );
+        _isLocationPermissionGranted = false;
+      });
     }
   }
 
   String _getDistanceText(Earthquake earthquake) {
-    if (_userLocation == null) return '';
+    String lat = earthquake.lintang.replaceAll('°', '').trim();
+    double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
+    if (lat.contains('LS')) latitude *= -1;
+
+    String lon = earthquake.bujur.replaceAll('°', '').trim();
+    double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
+
+    double distanceInMeters = Geolocator.distanceBetween(
+      _userLocation!.latitude,
+      _userLocation!.longitude,
+      latitude,
+      longitude,
+    );
     
-    try {
-      String lat = earthquake.lintang.replaceAll('°', '').trim();
-      double latitude = double.parse(lat.replaceAll(RegExp(r'[A-Za-z]'), ''));
-      if (lat.contains('LS')) latitude *= -1;
-
-      String lon = earthquake.bujur.replaceAll('°', '').trim();
-      double longitude = double.parse(lon.replaceAll(RegExp(r'[A-Za-z]'), ''));
-
-      double distanceInMeters = Geolocator.distanceBetween(
-        _userLocation!.latitude,
-        _userLocation!.longitude,
-        latitude,
-        longitude,
-      );
-      
-      String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
-      
-      if (distanceInMeters >= 1000) {
-        return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari $locationLabel';
-      } else {
-        return '${distanceInMeters.toStringAsFixed(0)} m dari $locationLabel';
-      }
-    } catch (e) {
-      debugPrint('Error calculating distance: $e');
-      return '';
+    // Check if using default location (ITENAS)
+    String locationLabel = _isLocationPermissionGranted ? 'lokasi kamu' : 'ITENAS';
+    
+    if (distanceInMeters >= 1000) {
+      return '${(distanceInMeters / 1000).toStringAsFixed(1)} km dari $locationLabel';
+    } else {
+      return '${distanceInMeters.toStringAsFixed(0)} m dari $locationLabel';
     }
   }
 
@@ -222,15 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
-                        child: _isLoading 
-                          ? const SizedBox(
-                              height: 300,
-                              child: Center(child: CircularProgressIndicator()),
-                            )
-                          : EarthquakeMap(
-                              earthquake: latestQuake,
-                              userLocation: _userLocation,
-                            ),
+                        child: EarthquakeMap(
+                          earthquake: latestQuake,
+                          userLocation: _userLocation,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -259,9 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(latestQuake.dirasakan),
                             ],
                             const SizedBox(height: 8),
-                            _isLoading 
-                              ? const Text('Menghitung jarak...')
-                              : Text(_getDistanceText(latestQuake)),
+                            Text(_getDistanceText(latestQuake)),
                           ],
                         ),
                       ),
